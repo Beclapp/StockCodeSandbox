@@ -1,6 +1,6 @@
 import React from "react";
 import "./styles.css";
-import ListItem from "./ListItem";
+import StockItem from "./StockItem";
 
 const finnhub = require("finnhub");
 const api_key = finnhub.ApiClient.instance.authentications["api_key"];
@@ -22,7 +22,7 @@ export default class App extends React.Component {
     };
   }
 
-  displayInfo = () => {
+  displayInfo = async () => {
     event.preventDefault();
     finnhubClient.quote(this.state.currDisplay, (error, data, response) => {
       console.log(data);
@@ -36,12 +36,11 @@ export default class App extends React.Component {
         color: color,
         curr: currentPrice
       });
-      this.setState({ stockUp: true });
     });
   };
 
   determinePrice = () => {
-    if (currentPrice > openPrice) {
+    if (currentPrice >= openPrice) {
       color = "green";
     } else {
       color = "red";
@@ -74,11 +73,12 @@ export default class App extends React.Component {
           <button onClick={this.clearList}>Clear</button>
         </form>
         <p style={{ color: color }}>
-          {stockdisplayed && "Current Price: $" + this.state.stock}
+          {stockdisplayed &&
+            this.state.currDisplay + " Current Price: $" + this.state.stock}
         </p>
         <ul>
           {this.state.list.map((item) => (
-            <ListItem
+            <StockItem
               data={item.symbol}
               color={item.color}
               currentPrice={item.curr}
