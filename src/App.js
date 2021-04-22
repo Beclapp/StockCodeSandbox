@@ -22,7 +22,7 @@ export default class App extends React.Component {
     };
   }
 
-  displayInfo = async () => {
+  displayInfo = () => {
     event.preventDefault();
     finnhubClient.quote(this.state.currDisplay, (error, data, response) => {
       console.log(data);
