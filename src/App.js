@@ -1,6 +1,7 @@
 import React from "react";
 import "./styles.css";
 import StockItem from "./StockItem";
+import update from "react-addons-update";
 
 const finnhub = require("finnhub");
 const api_key = finnhub.ApiClient.instance.authentications["api_key"];
@@ -18,14 +19,14 @@ export default class App extends React.Component {
     this.state = {
       currDisplay: "",
       stock: "",
-      list: []
+      list: [],
+      display: false
     };
   }
 
   displayInfo = () => {
     event.preventDefault();
     finnhubClient.quote(this.state.currDisplay, (error, data, response) => {
-      console.log(data);
       stockdisplayed = true;
       openPrice = data.o;
       currentPrice = data.c;
@@ -53,6 +54,32 @@ export default class App extends React.Component {
 
   clearList = () => {
     this.setState({ list: [] });
+  };
+
+  refreshList = () => {
+    let count = 0;
+    this.state.list.forEach((item) => {
+      finnhubClient.quote(item.symbol, (error, data, response) => {
+        openPrice = data.o;
+        let newPrice = data.c;
+        console.log(data);
+        this.determinePrice();
+        this.setState(
+          update(this.state, {
+            list: {
+              [count]: {
+                $set: {
+                  symbol: item.symbol,
+                  color: item.color,
+                  curr: newPrice
+                }
+              }
+            }
+          })
+        );
+        count++;
+      });
+    });
   };
 
   render() {
@@ -85,7 +112,7 @@ export default class App extends React.Component {
             />
           ))}
         </ul>
-        {stockdisplayed && <button>Refresh</button>}
+        {stockdisplayed && <button onClick={this.refreshList}>Refresh</button>}
       </div>
     );
   }
