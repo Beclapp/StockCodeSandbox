@@ -1,7 +1,6 @@
 import React from "react";
 import "./styles.css";
 import StockItem from "./StockItem";
-//import update from "react-addons-update";
 
 const finnhub = require("finnhub");
 const api_key = finnhub.ApiClient.instance.authentications["api_key"];
@@ -9,8 +8,6 @@ api_key.apiKey = "bvue7g748v6pkq83cj3g";
 const finnhubClient = new finnhub.DefaultApi();
 
 let stockdisplayed = false;
-//let currentPrice = "";
-//let color = "";
 let staticlist = [];
 let sum = 0;
 
@@ -20,7 +17,6 @@ export default class App extends React.Component {
     this.state = {
       currDisplay: "",
       stock: "",
-      //list: [],
       display: false
     };
   }
@@ -29,15 +25,12 @@ export default class App extends React.Component {
     event.preventDefault();
     finnhubClient.quote(this.state.currDisplay, (error, data, response) => {
       stockdisplayed = true;
-      //currentPrice = data.c;
       sum += data.c;
-      //this.setState({ stock: currentPrice });
       staticlist.push({
         symbol: this.state.currDisplay,
         color: this.determinePrice(data.o, data.c),
         curr: data.c
       });
-      //this.setState({ list: [...staticlist], currDisplay: "" });
       this.setState({ currDisplay: "" });
     });
   };
@@ -62,29 +55,13 @@ export default class App extends React.Component {
   };
 
   refreshList = () => {
-    //let count = 0;
     sum = 0;
     staticlist.forEach((item) => {
       finnhubClient.quote(item.symbol, (error, data, response) => {
         let newPrice = data.c;
         sum += data.c;
         this.determinePrice(data.c, data.o);
-        //this.setState(
-        //update(this.state, {
-        //list: {
-        //[count]: {
-        //$set: {
-        //symbol: item.symbol,
-        //color: this.determinePrice(data.c, data.o),
-        //curr: data.c
-        //}
-        //}
-        //}
-        //})
-        //);
         item.curr = newPrice;
-        //this.setState({ list: [...staticlist] });
-        //count++;
       });
     });
   };
