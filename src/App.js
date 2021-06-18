@@ -11,6 +11,10 @@ let stockdisplayed = false;
 let staticlist = [];
 let sum = 0;
 
+function roundTwo(num) {
+  return Math.round(num * 100) / 100;
+}
+
 export default class App extends React.Component {
   constructor(props) {
     super(props);
@@ -21,13 +25,33 @@ export default class App extends React.Component {
     };
   }
 
-  displayInfo = () => {
+  lookupSymbol = () => {
     event.preventDefault();
-    finnhubClient.quote(this.state.currDisplay, (error, data, response) => {
+    fetch(
+      "https://finnhub.io/api/v1/search?q=" +
+        this.state.currDisplay +
+        "&token=" +
+        api_key.apiKey
+    )
+      .then((data) => data.json())
+      .then((res) => {
+        if (res.count === 0) {
+        } else {
+          this.displayInfo(
+            res.result[0].displaySymbol,
+            res.result[0].description
+          );
+        }
+      });
+  };
+
+  displayInfo = (symbol, name) => {
+    finnhubClient.quote(symbol, (error, data, response) => {
       stockdisplayed = true;
       sum += data.c;
       staticlist.push({
-        symbol: this.state.currDisplay,
+        name: name,
+        symbol: symbol,
         color: this.determinePrice(data.o, data.c),
         curr: data.c
       });
@@ -58,10 +82,11 @@ export default class App extends React.Component {
     sum = 0;
     staticlist.forEach((item) => {
       finnhubClient.quote(item.symbol, (error, data, response) => {
-        let newPrice = data.c;
-        sum += data.c;
-        this.determinePrice(data.c, data.o);
+        let newPrice = roundTwo(data.c);
+        sum += newPrice;
+        this.determinePrice(newPrice, data.o);
         item.curr = newPrice;
+        this.setState({ currDisplay: "" });
       });
     });
   };
@@ -70,7 +95,7 @@ export default class App extends React.Component {
     return (
       <div className="App">
         <h1>Stock Displayer</h1>
-        <h2>Enter Stocks Below (Use Symbol):</h2>
+        <h2>Enter Stocks Below (Use Name):</h2>
         <form>
           <label>
             <input
@@ -80,14 +105,14 @@ export default class App extends React.Component {
               onChange={this.handleChange}
             />
           </label>
-          <button onClick={this.displayInfo}>Submit</button>
+          <button onClick={this.lookupSymbol}>Submit</button>
           <button onClick={this.clearList}>Clear</button>
         </form>
-        <p>{stockdisplayed && "Portfolio Value: $" + sum}</p>
+        <p>{stockdisplayed && "Portfolio Value: $" + roundTwo(sum)}</p>
         <ul>
           {staticlist.map((item) => (
             <StockItem
-              data={item.symbol}
+              data={item.name}
               color={item.color}
               currentPrice={item.curr}
             />
