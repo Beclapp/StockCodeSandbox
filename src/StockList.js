@@ -107,11 +107,13 @@ export default class StockList extends React.Component {
     sum = 0;
     staticlist.forEach((item) => {
       finnhubClient.quote(item.symbol, (error, data, response) => {
-        let newPrice = roundTwo(data.c);
-        sum += newPrice;
-        item.color = determinePrice(newPrice, data.o);
-        item.curr = newPrice;
-        this.setState({ currDisplay: "" });
+        if (data !== null) {
+          let newPrice = roundTwo(data.c);
+          sum += newPrice;
+          item.color = determinePrice(newPrice, data.o);
+          item.curr = newPrice;
+          this.setState({ currDisplay: "" });
+        }
       });
     });
   };
