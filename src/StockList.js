@@ -16,6 +16,9 @@ let staticlist = [];
 //Sum of the total portfolio price
 let sum = 0;
 
+//Lets each stock item keep track of its place on the list.
+let index = 0;
+
 //Rounds Numbers up to two digits.
 function roundTwo(num) {
   return Math.round(num * 100) / 100;
@@ -83,8 +86,10 @@ export default class StockList extends React.Component {
         name: name,
         symbol: symbol,
         color: determinePrice(data.c, data.o),
-        curr: data.c
+        curr: data.c,
+        shares: 1
       });
+      index++;
       this.setState({ currDisplay: "" });
     });
   };
@@ -102,6 +107,20 @@ export default class StockList extends React.Component {
     stockdisplayed = false;
   };
 
+  addShare = (name) => {
+    let item = staticlist.find((share) => name === share.name);
+    sum += item.curr;
+    item.shares += 1;
+    this.setState({ currDisplay: "" });
+  };
+
+  removeShare = (name) => {
+    let item = staticlist.find((share) => name === share.name);
+    sum -= item.curr;
+    item.shares -= 1;
+    this.setState({ currDisplay: "" });
+  };
+
   //Updates every list item with the current price and color.
   refreshList = () => {
     sum = 0;
@@ -109,7 +128,7 @@ export default class StockList extends React.Component {
       finnhubClient.quote(item.symbol, (error, data, response) => {
         if (data !== null) {
           let newPrice = roundTwo(data.c);
-          sum += newPrice;
+          sum += newPrice * item.shares;
           item.color = determinePrice(newPrice, data.o);
           item.curr = newPrice;
           this.setState({ currDisplay: "" });
@@ -128,6 +147,7 @@ export default class StockList extends React.Component {
               name="name"
               value={this.state.currDisplay}
               onChange={this.handleChange}
+              index={index}
             />
           </label>
           <button onClick={this.lookupSymbol}>Submit</button>
@@ -140,6 +160,8 @@ export default class StockList extends React.Component {
               data={item.name}
               color={item.color}
               currentPrice={item.curr}
+              addShare={this.addShare}
+              decreaseShare={this.removeShare}
             />
           ))}
         </ul>

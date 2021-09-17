@@ -18,10 +18,11 @@ export default class StockItem extends React.Component {
     };
   }
 
-  addShare = () => {
+  increaseShare = () => {
     this.setState({
       shares: this.state.shares + 1
     });
+    this.props.addShare(this.props.data);
   };
 
   removeShare = () => {
@@ -29,6 +30,7 @@ export default class StockItem extends React.Component {
       this.setState({
         shares: this.state.shares - 1
       });
+      this.props.decreaseShare(this.props.data);
     }
   };
 
@@ -52,7 +54,7 @@ export default class StockItem extends React.Component {
             }
           />
           <ListItemSecondaryAction>
-            <button onClick={this.addShare}>+</button>
+            <button onClick={this.increaseShare}>+</button>
             <button onClick={this.removeShare}>-</button>
           </ListItemSecondaryAction>
         </ListItem>
