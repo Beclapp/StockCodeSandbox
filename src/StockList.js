@@ -107,6 +107,7 @@ export default class StockList extends React.Component {
     stockdisplayed = false;
   };
 
+  //Adds a share to the list item.
   addShare = (name) => {
     let item = staticlist.find((share) => name === share.name);
     sum += item.curr;
@@ -114,10 +115,18 @@ export default class StockList extends React.Component {
     this.setState({ currDisplay: "" });
   };
 
+  //Removes a share from the list item.
   removeShare = (name) => {
     let item = staticlist.find((share) => name === share.name);
     sum -= item.curr;
     item.shares -= 1;
+    this.setState({ currDisplay: "" });
+  };
+
+  deleteShare = (name) => {
+    let item = staticlist.find((share) => name === share.name);
+    sum -= item.curr * item.shares;
+    staticlist.splice(staticlist.indexOf(item), 1);
     this.setState({ currDisplay: "" });
   };
 
@@ -162,6 +171,7 @@ export default class StockList extends React.Component {
               currentPrice={item.curr}
               addShare={this.addShare}
               decreaseShare={this.removeShare}
+              deleteShare={this.deleteShare}
             />
           ))}
         </ul>

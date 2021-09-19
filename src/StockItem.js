@@ -18,6 +18,7 @@ export default class StockItem extends React.Component {
     };
   }
 
+  //Adds a share.
   increaseShare = () => {
     this.setState({
       shares: this.state.shares + 1
@@ -25,6 +26,7 @@ export default class StockItem extends React.Component {
     this.props.addShare(this.props.data);
   };
 
+  //Removes a share by one.
   removeShare = () => {
     if (this.state.shares > 1) {
       this.setState({
@@ -34,8 +36,12 @@ export default class StockItem extends React.Component {
     }
   };
 
-  getData = () => {
-    return roundTwo(this.props.currentPrice * this.state.shares);
+  deleteItem = () => {
+    if (
+      window.confirm("Are you sure you want to remove " + this.props.data + "?")
+    ) {
+      this.props.deleteShare(this.props.data);
+    }
   };
 
   render() {
@@ -56,6 +62,7 @@ export default class StockItem extends React.Component {
           <ListItemSecondaryAction>
             <button onClick={this.increaseShare}>+</button>
             <button onClick={this.removeShare}>-</button>
+            <button onClick={this.deleteItem}>Remove</button>
           </ListItemSecondaryAction>
         </ListItem>
       </List>
